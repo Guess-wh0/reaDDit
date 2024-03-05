@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 # loading secrets from .env
 load_dotenv()
 
-def reddit_etl:
+def reddit_etl():
   print("*************************STARTED DATA FETCH********************")
 
   reddit = praw.Reddit(
@@ -39,9 +39,9 @@ def reddit_etl:
     reddit_posts.append(post_details)
 
   df = pd.DataFrame(reddit_posts)
-  client = storage.Client()
+  client = storage.Client.from_service_account_json(json_credentials_path=os.getenv('GCP_KEY_PATH'))
   bucket = client.get_bucket(os.getenv("BUCKET_NAME"))
       
-  bucket.blob('fetched_reddit_data.csv').upload_from_string(df.to_csv(), 'text/csv')
+  bucket.blob(datetime.now().strftime("%Y%m%d%H%M%S") + 'fetched_reddit_data.csv').upload_from_string(df.to_csv(), 'text/csv')
 
   print("*************************ENDED DATA FETCH********************")
